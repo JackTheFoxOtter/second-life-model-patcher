@@ -25,8 +25,8 @@ It then defines a 'triangle' for each added vertex (each 'corner' of the triangl
 
 ## Installation
 You will require two additional dependencies:
-* PyQt5, responsible for the beautiful UI (`pip install PyQt5`)
-* PyCollada, responsible for reading, modifying and writing the Collada data (`pip install pycollada`)
+* [PyQt5](https://pypi.org/project/PyQt5/ "PyQt5 on PyPI"), responsible for the beautiful UI (`pip install PyQt5`)
+* [pycollada](https://github.com/pycollada/pycollada "pycollada on GitHub"), responsible for reading, modifying and writing the Collada data (`pip install pycollada`)
 
 ## Future
 As it stands right now, this tool is a stand-alone solution.
