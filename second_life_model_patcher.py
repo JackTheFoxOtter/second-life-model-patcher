@@ -13,6 +13,8 @@ class App(QWidget):
     lineEditPath2 = None
     valueLabels1 = []
     valueLabels2 = []
+    offsetLineEdit1 = None
+    offsetLineEdit2 = None
     meshLabel1 = None
     meshLabel2 = None
     mesh1 = None
@@ -20,7 +22,7 @@ class App(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.title = "Second Life Model Patcher V0.1 by JackTheFoxOtter"
+        self.title = "Second Life Model Patcher V0.2 by JackTheFoxOtter"
         self.width = 800
         self.initUi()
 
@@ -85,7 +87,7 @@ class App(QWidget):
         spacer = QFrame()
         spacer.setFrameShape(QFrame.VLine)
         spacer.setForegroundRole(QPalette.Base)
-        grid.addWidget(spacer, 3, 2, 7, 1)
+        grid.addWidget(spacer, 3, 2, 8, 1)
         # Model 2 info
         self.meshLabel2 = QLabel()
         self.meshLabel2.setText("Secondary Model")
@@ -109,25 +111,33 @@ class App(QWidget):
         label = QLabel()
         grid.addWidget(label, 9, 3, 1, 2, Qt.AlignCenter)
         self.valueLabels2.append(label)
+        # Offset Labels
+        self.offsetLineEdit1 = QLineEdit()
+        grid.addWidget(self.offsetLineEdit1, 10, 0, 1, 2)
+        self.offsetLineEdit1.setReadOnly(True);
+        self.offsetLineEdit1.setText("<0.0, 0.0, 0.0>")
+        self.offsetLineEdit1.setAlignment(Qt.AlignCenter)
+        self.offsetLineEdit2 = QLineEdit()
+        grid.addWidget(self.offsetLineEdit2, 10, 3, 1, 2)
+        self.offsetLineEdit2.setReadOnly(True);
+        self.offsetLineEdit2.setText("<0.0, 0.0, 0.0>")
+        self.offsetLineEdit2.setAlignment(Qt.AlignCenter)
         # Horizontal spacer
         spacer = QFrame()
         spacer.setFrameShape(QFrame.HLine)
         spacer.setForegroundRole(QPalette.Base)
-        grid.addWidget(spacer, 10, 0, 1, 5)
+        grid.addWidget(spacer, 11, 0, 1, 5)
         # Match Bounding Box Button
         button = QPushButton("Match Primary Bounding Box", self)
         button.clicked.connect(self.onClick_match)
-        grid.addWidget(button, 11, 0, 1, 5)
+        grid.addWidget(button, 12, 0, 1, 5)
 
         self.onTextChanged_lineEdit1()
         self.onTextChanged_lineEdit2()
         self.show()
 
         # DEBUG
-        # self.lineEditPath1.setText('H:/#Google Sync/_Projects/_Second Life/_Assets/_Objects/Modular Sci-Fi rooms/Test_Object_LOD0.dae')
-        # self.lineEditPath2.setText('H:/#Google Sync/_Projects/_Second Life/_Assets/_Objects/Modular Sci-Fi rooms/Test_Object_COLL.dae')
-        # self.lineEditPath1.setText('H:/#Google Sync/_Projects/_Second Life/_Assets/_Objects/Modular Sci-Fi rooms/Doors/Door_Left_LOD0.dae')
-        # self.lineEditPath2.setText('H:/#Google Sync/_Projects/_Second Life/_Assets/_Objects/Modular Sci-Fi rooms/Doors/Door_Left_LOD1.dae')
+        # self.lineEditPath1.setText('H:/#Google Sync/_Projects/_Second Life/_Objects/Modular Sci-Fi Rooms/Walls/Wall_Solid_LOD0.dae')
         # self.onClick_match()
 
     @pyqtSlot()
@@ -150,11 +160,13 @@ class App(QWidget):
             self.meshLabel1.setText(f"Primary Model (<font color=#FF4444>{validation_result[1]}</font>)")
             self.mesh1 = None
             self.clearCoordsLabels(self.valueLabels1)
+            self.clearOffsetVector(self.offsetLineEdit1)
         else:
             self.meshLabel1.setText(f"Primary Model")
             self.mesh1 = Collada(text)
             coords = self.getBoundingCoordsFromCollada(self.mesh1)
             self.updateCoordsLabels(self.valueLabels1, coords)
+            self.updateOffsetVector(self.offsetLineEdit1, coords)
 
     @pyqtSlot()
     def onTextChanged_lineEdit2(self):
@@ -164,11 +176,13 @@ class App(QWidget):
             self.meshLabel2.setText(f"Secondary Model (<font color=#FF4444>{validation_result[1]}</font>)")
             self.mesh2 = None
             self.clearCoordsLabels(self.valueLabels2)
+            self.clearOffsetVector(self.offsetLineEdit2)
         else:
             self.meshLabel2.setText(f"Secondary Model")
             self.mesh2 = Collada(text)
             coords = self.getBoundingCoordsFromCollada(self.mesh2)
             self.updateCoordsLabels(self.valueLabels2, coords)
+            self.updateOffsetVector(self.offsetLineEdit2, coords)
 
     @pyqtSlot()
     def onClick_match(self):
@@ -331,6 +345,18 @@ class App(QWidget):
 
         for i in range(len(labels)):
             labels[i].setText(coordinateLabels[i] + str(coords[i]))
+
+    def clearOffsetVector(self, lineEdit):
+        lineEdit.setText("")
+
+    def updateOffsetVector(self, lineEdit, coords):
+        offsetX = round((coords[1] + coords[0])/2, 5)
+        offsetY = round((coords[3] + coords[2])/2, 5)
+        offsetZ = round((coords[5] + coords[4])/2, 5)
+        # offsetX = (coords[1] + coords[0])/2
+        # offsetY = (coords[3] + coords[2])/2
+        # offsetZ = (coords[5] + coords[4])/2
+        lineEdit.setText(f"<{offsetX}, {offsetY}, {offsetZ}>")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
